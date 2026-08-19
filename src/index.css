@@ -104,7 +104,7 @@ body {
   color: #ffffffb3;
   white-space: nowrap;
   font-family: Dingos, sans-serif;
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 400;
   line-height: 140%;
 }
@@ -113,8 +113,8 @@ body {
   letter-spacing: -0.01em;
   color: #ffffff;
   white-space: nowrap;
-  font-family: JustMeAgainDownHere, sans-serif;
-  font-size: 46px;
+  font-family: 'Just Me Again Down Here', cursive;
+  font-size: 2rem;
   font-weight: 700;
   line-height: 140%;
 }
