@@ -6,6 +6,7 @@ import TicketDetailUi from "../TicketDetail/TicketDetailUi";
 import NfcUi from "../NfcPage/NfcUi";
 import FAQUi from "../FAQPage/FAQUi";
 import LoginUi from "../LoginPage/LoginUi";
+import DashboardUi from "../AdminDashboard/DashboardUi";
 
 const routeUiMap: Record<string, React.ReactNode> = {
   "/": <EventCardUi />,
@@ -13,6 +14,7 @@ const routeUiMap: Record<string, React.ReactNode> = {
   "/nfc": <NfcUi />,
   "/faq": <FAQUi />,
   "/login": <LoginUi />,
+  "/dashboard": <DashboardUi />,
 };
 
 const PageHtmlUi = () => {

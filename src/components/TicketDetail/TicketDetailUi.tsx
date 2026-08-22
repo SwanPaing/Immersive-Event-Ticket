@@ -6,6 +6,7 @@ import { pageColor } from "../../libs/config/pageColor";
 import { useSearchParams } from "react-router";
 import gsap from "gsap";
 import Review from "./Review";
+import { X, Calendar, MapPin, Ticket, Clock, Users } from 'lucide-react';
 
 const colorA = pageColor.Detail.colorA;
 const colorB = pageColor.Detail.colorB;
@@ -94,8 +95,7 @@ const About = () => {
   return (
     <section className="ticket-detail-about-tab">
       <div className="ticket-detail-content relative">
-        <div>
-          <span className="date">10.8.2026</span>
+        <div className="ticket-header">
           <h1 className="title">Event Title</h1>
         </div>
         <p className="desc-text">
@@ -104,10 +104,26 @@ const About = () => {
           habits that turn a demo into something you can ship.
         </p>
         <p className="speaker">
-          With <a>Naruto</a>
+          Hosted by <a>Naruto</a>
           <span> &amp; </span>
           <a>Sasuke</a>
         </p>
+        <div className="event-meta">
+          <span className="meta-tag"><Calendar size={18} className="meta-icon text-purple-500" /> 10.8.2026</span>
+          <span className="meta-tag"><Clock size={18} className="meta-icon text-blue-500" /> 19:00 - 21:00</span>
+          <span className="meta-tag"><MapPin size={18} className="meta-icon text-red-500" /> Tokyo, Japan</span>
+        </div>
+
+        <div className="capacity-bar-wrapper">
+          <div className="capacity-bar-header">
+            <span className="capacity-label"><Users size={15} className="capacity-icon" /> Availability</span>
+            <span className="capacity-value">74 / 100</span>
+          </div>
+          <div className="capacity-bar-track">
+            <div className="capacity-bar-fill" style={{ width: "74%" }} />
+          </div>
+          <span className="capacity-subtext">26 spots remaining</span>
+        </div>
         <div className="buy-ticket-btn-container">
           <WobbleButton
             text="Buy Ticket"

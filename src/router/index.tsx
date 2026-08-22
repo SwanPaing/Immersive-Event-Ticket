@@ -11,6 +11,7 @@ import LoginPage from "../components/LoginPage";
 import TicketDetailPage from "../components/TicketDetail";
 import NfcPage from "../components/NfcPage";
 import FAQPage from "../components/FAQPage";
+import AdminDashboard from "../components/AdminDashboard";
 
 export const AppRoutes = () => {
   return (
@@ -20,6 +21,7 @@ export const AppRoutes = () => {
       <Route path="/detail" element={<TicketDetailPage />} />
       <Route path="/nfc" element={<NfcPage />} />
       <Route path="/faq" element={<FAQPage />} />
+      <Route path="/dashboard" element={<AdminDashboard />} />
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
