@@ -1,12 +1,20 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import WobbleButton from "../UI/WobbleButton";
 import gsap from "gsap";
+import { useSearchParams } from "react-router";
+import { createRipple } from "../../libs/createRipple";
+import CreateEventUi from "./CreateEventUi";
 
 /* ─────────────────────────────────────────────
    Dashboard root
 ───────────────────────────────────────────── */
 const DashboardUi = () => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Read view from URL: ?view=create or ?tab=create. Default to overview.
+  const viewParam = searchParams.get("view") || searchParams.get("tab");
+  const activeView = viewParam === "create" ? "create" : "overview";
 
   /* Stagger-in all cards / sections on mount */
   useEffect(() => {
@@ -21,7 +29,7 @@ const DashboardUi = () => {
     }, containerRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [activeView]);
 
   /* Fade out when menu is opened (matches other pages) */
   useEffect(() => {
@@ -36,85 +44,156 @@ const DashboardUi = () => {
     return () => window.removeEventListener("menu-click", handleMenuClose);
   }, []);
 
+  const triggerRippleAt = (
+    e?: React.MouseEvent,
+    colorA = "#9898ef",
+    colorB = "#6dd2b0"
+  ) => {
+    let x = 0;
+    let y = 0;
+    if (e?.currentTarget) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      x = (centerX / window.innerWidth) * 2 - 1;
+      y = -(centerY / window.innerHeight) * 2 + 1;
+    }
+    createRipple({
+      coord: { x, y },
+      isPageTransition: false,
+      colorA,
+      colorB,
+      rippleDirection: "out",
+      timeScale: 0.6,
+    });
+  };
+
+  const handleOpenCreate = (e?: React.MouseEvent) => {
+    triggerRippleAt(e, "#03ddcf", "#2000cf");
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        next.set("view", "create");
+        return next;
+      },
+      { replace: true }
+    );
+  };
+
+  const handleBackToOverview = (e?: React.MouseEvent) => {
+    triggerRippleAt(e, "#06ecff", "#9898ff");
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        next.delete("view");
+        next.delete("tab");
+        return next;
+      },
+      { replace: true }
+    );
+  };
+
   return (
     <div className="dashboard-overlay text-black" ref={containerRef}>
       <div className="dashboard-panel">
-
-        {/* ── Header ── */}
-        <header className="db-header db-animate">
-          <div>
-            <p className="db-greeting">Good morning, Organizer 👋</p>
-          </div>
-          <div>
-            <WobbleButton
-              text="+ Create Event"
-              fillColor="#9898ef"
-              textColor="black"
-              width={200}
-              height={60}
-              fontSize={1.15}
-              bulgeAmount={3}
-              stiffness={0.04}
-              damping={0.96}
-              fontFamily="Dingos-Bold"
-              proximityThreshold={70}
-            />            
-          </div>
-        </header>
-
-        {/* ── KPI Cards ── */}
-        <div className="db-kpi-grid">
-          <KpiCard
-            id="kpi-events"
-            icon="📅"
-            label="Total Events"
-            value="32"
-            trend=""
-            trendUp={null}
-            accent="#f7a76c"
-          />
-          <KpiCard
-            id="kpi-tickets"
-            icon="🎟"
-            label="Tickets Sold"
-            value="1,284"
-            trend="+12%"
-            trendUp
-            accent="#7c6ef7"
-          />
-          <KpiCard
-            id="kpi-revenue"
-            icon="💰"
-            label="Total Revenue"
-            value="$38,520"
-            trend="+8.4%"
-            trendUp
-            accent="#6dd2b0"
-          />
-          <KpiCard
-            id="kpi-rating"
-            icon="⭐"
-            label="Avg. Rating"
-            value="4.7"
-            trend="+0.2 this month"
-            trendUp
-            accent="#ef87d4"
-          />
+        <div key={activeView} className="tab-panel">
+          {activeView === "overview" ? (
+            <DashboardOverview onOpenCreate={handleOpenCreate} />
+          ) : (
+            <CreateEventUi onBack={handleBackToOverview} />
+          )}
         </div>
-
-        {/* ── Charts row ── */}
-        <div className="db-charts-row">
-          <RevenueChart />
-          <AttendeeDonut />
-        </div>
-
-        {/* ── Recent Events ── */}
-        <EventsTable />
-
-        {/* bottom padding */}
-        <div style={{ height: 60 }} />
       </div>
     </div>
+  );
+};
+
+/* ─────────────────────────────────────────────
+   Dashboard Overview Content
+───────────────────────────────────────────── */
+interface DashboardOverviewProps {
+  onOpenCreate: (e?: React.MouseEvent) => void;
+}
+
+const DashboardOverview = ({ onOpenCreate }: DashboardOverviewProps) => {
+  return (
+    <>
+      {/* ── Header ── */}
+      <header className="db-header db-animate">
+        <div>
+          <p className="db-greeting">Good morning, Organizer 👋</p>
+        </div>
+        <div>
+          <WobbleButton
+            text="+ Create Event"
+            hoverText="Let's Go!"
+            fillColor="#2000cf"
+            textColor="white"
+            width={200}
+            height={60}
+            fontSize={1.15}
+            bulgeAmount={3}
+            stiffness={0.04}
+            damping={0.96}
+            fontFamily="Dingos-Bold"
+            proximityThreshold={70}
+            onClick={onOpenCreate}
+          />
+        </div>
+      </header>
+
+      {/* ── KPI Cards ── */}
+      <div className="db-kpi-grid">
+        <KpiCard
+          id="kpi-events"
+          icon="📅"
+          label="Total Events"
+          value="32"
+          trend=""
+          trendUp={null}
+          accent="#f7a76c"
+        />
+        <KpiCard
+          id="kpi-tickets"
+          icon="🎟"
+          label="Tickets Sold"
+          value="1,284"
+          trend="+12%"
+          trendUp
+          accent="#7c6ef7"
+        />
+        <KpiCard
+          id="kpi-revenue"
+          icon="💰"
+          label="Total Revenue"
+          value="$38,520"
+          trend="+8.4%"
+          trendUp
+          accent="#6dd2b0"
+        />
+        <KpiCard
+          id="kpi-rating"
+          icon="⭐"
+          label="Avg. Rating"
+          value="4.7"
+          trend="+0.2 this month"
+          trendUp
+          accent="#ef87d4"
+        />
+      </div>
+
+      {/* ── Charts row ── */}
+      <div className="db-charts-row">
+        <RevenueChart />
+        <AttendeeDonut />
+      </div>
+
+      {/* ── Recent Events ── */}
+      <EventsTable />
+
+      {/* bottom padding */}
+      <div style={{ height: 60 }} />
+    </>
   );
 };
 
